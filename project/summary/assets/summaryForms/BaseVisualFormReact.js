@@ -9,12 +9,14 @@ import 'react-select/dist/react-select.css';
 import h from 'shared/utils/helpers';
 import { splitStartup } from 'utils/WebpackSplit';
 import HAWCUtils from 'utils/HAWCUtils';
+import Loading from 'shared/components/Loading';
 
 class BaseVisualForm extends Component {
     constructor(props) {
         super(props);
         this.config = JSON.parse(document.getElementById('config').textContent);
         this.state = {
+            loaded: false,
             title: '',
             slug: '',
             dose_units: null,
@@ -34,6 +36,7 @@ class BaseVisualForm extends Component {
                 .then((json) => {
                     let { title, slug, dose_units, endpoints, settings, caption, published } = json;
                     this.setState({
+                        loaded: true,
                         title,
                         slug,
                         dose_units,
@@ -117,6 +120,10 @@ class BaseVisualForm extends Component {
     }
 
     render() {
+        if (!this.state.loaded) {
+            return <Loading />;
+        }
+
         return (
             <Tabs onSelect={this.handleTabSelection}>
                 <TabList>
