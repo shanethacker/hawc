@@ -32,6 +32,7 @@ class QuillTextInput extends Component {
                         name={this.props.name}
                         value={this.props.value}
                         style={{ display: 'none' }}
+                        onChange={() => {}}
                     />
                     {this.props.helpText ? (
                         <p className="help-block">{this.props.helpText}</p>
