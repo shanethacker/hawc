@@ -16,16 +16,17 @@ class BaseVisualForm extends Component {
         super(props);
         this.config = JSON.parse(document.getElementById('config').textContent);
         this.state = {
-            loaded: false,
-            title: '',
-            slug: '',
-            dose_units: null,
             caption: '',
-            published: '',
-            visual_type: this.config.visual_type,
-            settings: 'undefined',
-            endpoints: [],
             dataRefreshRequired: true,
+            dose_units: null,
+            endpoints: [],
+            loaded: false,
+            prefilters: {},
+            published: '',
+            settings: 'undefined',
+            slug: '',
+            title: '',
+            visual_type: this.config.visual_type,
         };
     }
 
@@ -34,21 +35,23 @@ class BaseVisualForm extends Component {
             fetch(`${this.config.data_url}${this.config.instance.id}`, h.fetchGet)
                 .then((response) => response.json())
                 .then((json) => {
-                    let { title, slug, dose_units, endpoints, settings, caption, published } = json;
+                    let { settings, ...data } = json,
+                        state = this.formatIncoming(data);
                     this.setState({
                         loaded: true,
-                        title,
-                        slug,
-                        dose_units,
-                        caption,
-                        published,
                         visual_type: this.config.visual_type,
                         settings: JSON.stringify(settings),
-                        endpoints: this.getEndpointChoices(endpoints),
+                        ...state,
                     });
                 });
         }
     }
+
+    formatForMultiselect = (arr, valueKey, labelKey) => {
+        return arr.map((el) => {
+            return { value: el[valueKey], label: el[labelKey] };
+        });
+    };
 
     handleInputChange = (e) => {
         this.setState({ [e.target.name]: e.target.value, dataRefreshRequired: true });
@@ -77,10 +80,6 @@ class BaseVisualForm extends Component {
         this.setState(newState);
     };
 
-    handleEndpointSelect = (value) => {
-        this.setState({ endpoints: value, dataRefreshRequired: true });
-    };
-
     handleTabSelection = (tabIndex) => {
         // Get new data for chart if a user clicks the preview tab and
         // the data has changed.
@@ -92,20 +91,9 @@ class BaseVisualForm extends Component {
         }
     };
 
-    getEndpointChoices(endpoint) {
-        return [];
+    formatIncoming(json) {
+        return HAWCUtils.abstractMethod();
     }
-
-    fetchEndpoints = (input, callback) => {
-        fetch(
-            `${this.config.endpoint_url}?related=${this.config.assessment}&term=${input}`,
-            h.fetchGet
-        )
-            .then((response) => response.json())
-            .then((json) => {
-                callback(null, { options: json.data });
-            });
-    };
 
     renderForm() {
         return HAWCUtils.abstractMethod();

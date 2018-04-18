@@ -1,6 +1,5 @@
 import $ from '$';
 import React from 'react';
-import { Async } from 'react-select';
 
 import 'react-tabs/style/react-tabs.css';
 import 'react-select/dist/react-select.css';
@@ -8,13 +7,34 @@ import 'react-select/dist/react-select.css';
 import BaseVisualForm from './BaseVisualFormReact';
 import EndpointAggregation from 'summary/EndpointAggregation';
 
+import h from 'shared/utils/helpers';
 import { splitStartup } from 'utils/WebpackSplit';
+import MultiselectInput from 'shared/components/MultiselectInput';
 import QuillTextInput from 'shared/components/QuillTextInput';
 import SelectInput from 'shared/components/SelectInput';
 import TextInput from 'shared/components/TextInput';
 import TextAreaInput from 'shared/components/TextAreaInput';
 
 class EndpointAggregationForm extends BaseVisualForm {
+    formatIncoming = (json) => {
+        let { endpoints, ...rest } = json;
+        return {
+            endpoints: this.getEndpointChoices(endpoints),
+            ...rest,
+        };
+    };
+
+    fetchEndpoints = (input, callback) => {
+        fetch(
+            `${this.config.endpoint_url}?related=${this.config.assessment}&term=${input}`,
+            h.fetchGet
+        )
+            .then((response) => response.json())
+            .then((json) => {
+                callback(null, { options: json.data });
+            });
+    };
+
     getEndpointChoices = (endpoints) => {
         return endpoints.map((e) => {
             let s = e.animal_group.experiment.study.short_citation,
@@ -62,24 +82,16 @@ class EndpointAggregationForm extends BaseVisualForm {
                     value={this.state.dose_units}
                     handleSelect={this.handleDoseUnitSelect}
                 />
-                <div className="control-group">
-                    <label className="control-label">
-                        Endpoints
-                        <span className="asteriskField">*</span>
-                    </label>
-                    <Async
-                        multi
-                        name="endpoints"
-                        value={this.state.endpoints}
-                        onChange={this.handleEndpointSelect}
-                        autoload={false}
-                        loadOptions={this.fetchEndpoints}
-                        backspaceRemoves={false}
-                        deleteRemoves={false}
-                        clearable={false}
-                        onValueClick={(ep) => window.open(`/ani/endpoint/${ep.value}`, '_blank')}
-                    />
-                </div>
+                <MultiselectInput
+                    async
+                    required
+                    name="endpoints"
+                    label="Endpoints"
+                    value={this.state.endpoints}
+                    onChange={this.handleInputChange}
+                    loadOptions={this.fetchEndpoints}
+                    onValueClick={(ep) => window.open(`/ani/endpoint/${ep.value}`, '_blank')}
+                />
                 <TextAreaInput
                     name="settings"
                     label="Settings"
