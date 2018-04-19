@@ -9,6 +9,7 @@ import EndpointAggregation from 'summary/EndpointAggregation';
 
 import h from 'shared/utils/helpers';
 import { splitStartup } from 'utils/WebpackSplit';
+import CheckboxInput from 'shared/components/CheckboxInput';
 import MultiselectInput from 'shared/components/MultiselectInput';
 import QuillTextInput from 'shared/components/QuillTextInput';
 import SelectInput from 'shared/components/SelectInput';
@@ -70,7 +71,8 @@ class EndpointAggregationForm extends BaseVisualForm {
                     label="URL Name"
                     value={this.state.slug}
                     onChange={this.handleInputChange}
-                    helpText="The URL (web address) used to describe this object (no spaces or special-characters)."
+                    helpText="The URL (web address) used to describe this object
+                              (no spaces or special-characters)."
                     required
                 />
                 <SelectInput
@@ -97,7 +99,8 @@ class EndpointAggregationForm extends BaseVisualForm {
                     label="Settings"
                     value={this.state.settings}
                     onChange={this.handleInputChange}
-                    helpText="Paste from another visualization to copy settings, or set to &quot;undefined&quot;."
+                    helpText="Paste from another visualization to copy settings,
+                              or set to &quot;undefined&quot;."
                     required
                 />
                 <QuillTextInput
@@ -106,25 +109,14 @@ class EndpointAggregationForm extends BaseVisualForm {
                     value={this.state.caption}
                     onChange={this.handleInputChange}
                 />
-                <div id="div_id_published" className="control-group">
-                    <div className="controls">
-                        <label htmlFor="id_published" className="checkbox">
-                            Publish visual for public viewing
-                            <input
-                                onChange={this.handleCheckboxChange}
-                                type="checkbox"
-                                name="published"
-                                className="checkboxinput"
-                                id="id_published"
-                                checked={this.state.published}
-                            />
-                        </label>
-                        <p id="hint_id_published" className="help-block">
-                            For assessments marked for public viewing, mark visual to be viewable by
-                            public
-                        </p>
-                    </div>
-                </div>
+                <CheckboxInput
+                    name="published"
+                    label="Publish visual for public viewing"
+                    checked={this.state.published}
+                    onChange={this.handleCheckboxChange}
+                    helpText="For assessments marked for public viewing,
+                              mark visual to be viewable by public"
+                />
             </div>
         );
     };
